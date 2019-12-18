@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cod]
 
+.vscode
+
 # C and Fortran extensions
 *.so
 *.dylib
