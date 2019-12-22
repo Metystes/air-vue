@@ -1,58 +1,47 @@
-from flask import Flask, render_template, request
+import plotly.graph_objects as go
+from flask import Flask, render_template
+#import plotly.figure_factory as ff
+import plotly.express as px
 import plotly
-import plotly.graph_objs as go
-
-import pandas as pd
-import numpy as np
 import json
+
+import numpy as np
+import pandas as pd
 
 app = Flask(__name__)
 
-
-@app.route('/')
-def index():
-    feature = 'Bar'
-    bar = create_plot(feature)
-    return render_template('index.html', plot=bar)
+def get_data():
+    pass
 
 
-def create_plot(feature):
-    if feature == 'Bar':
-        N = 40
-        x = np.linspace(0, 1, N)
-        y = np.random.randn(N)
-        df = pd.DataFrame({'x': x, 'y': y})  # creating a sample dataframe
-        data = [
-            go.Bar(
-                x=df['x'],  # assign x as the dataframe column 'x'
-                y=df['y']
-            )
-        ]
-    else:
-        N = 1000
-        random_x = np.random.randn(N)
-        random_y = np.random.randn(N)
+def plot_map(data):
+    """[summary]
+    
+    Arguments:
+        data {[df]} -- [dataframe containing at leat 3 columns: Latitude, Longitude, value]
+    
+    Returns:
+        [type] -- [description]
+    """    
+    quakes = pd.read_csv(
+        'https://raw.githubusercontent.com/plotly/datasets/master/earthquakes-23k.csv')
 
-        # Create a trace
-        data = [go.Scatter(
-            x=random_x,
-            y=random_y,
-            mode='markers'
-        )]
+    fig = go.Figure(go.Densitymapbox(lat=quakes.Latitude, lon=quakes.Longitude, z=quakes.Magnitude,
+                                    radius=10))
+    fig.update_layout(mapbox_style="stamen-terrain", mapbox_center_lon=180)
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    fig.layout.template = None
 
-    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
-
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
 
 
-@app.route('/bar', methods=['GET', 'POST'])
-def change_features():
 
-    feature = request.args['selected']
-    graphJSON = create_plot(feature)
-
-    return graphJSON
+@app.route("/")
+def home():
+    graphJSON = plot_map()
+    return render_template('index.html', v=graphJSON)
 
 
-if __name__ == '__main__':
-    app.run()
+if __name__ == "__main__":
+    app.run(debug=True)

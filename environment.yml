@@ -1,1 +1,14 @@
+name: air-vue
+channels:
+  - defaults
+dependencies:
+  - pandas
+  - python=3.7
+  - plotly=4.1.1
+  - jupyter
+  - flask
+  - plotly-geo
+  - sqlalchemy
+  - fastparquet
+prefix: /Users/michal/opt/miniconda3/envs/air-vue
 

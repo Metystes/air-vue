@@ -2,7 +2,7 @@ Air Vue
 ====================
 
 
-InFinding clear path, place for sport activities in polluted cities. Firsty, we use interpolation of air pollution sensors to have estimated air pollution in every place in the city. Then we create alghorithm to find the most clear place near you. Also, we would like to add possibility to set the shortest path to the point with the less air pollution.
+Finding clear path, place for sport activities in polluted cities. Firsty, we use interpolation of air pollution sensors to have estimated air pollution in every place in the city. Then we create alghorithm to find the most clear place near you. Also, we would like to add possibility to set the shortest path to the point with the less air pollution.
 
 **Start Date:** 20-10-2019
 
