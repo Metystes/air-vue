@@ -1,34 +1,42 @@
+# Import Global modules
 import plotly.graph_objects as go
 from flask import Flask, render_template
-#import plotly.figure_factory as ff
-import plotly.express as px
 import plotly
 import json
 
-import numpy as np
 import pandas as pd
+
+# Import local modules
+from src.data.createDB import (Database, db_backend, db_name)
 
 app = Flask(__name__)
 
+
 def get_data():
-    pass
+    dbms = Database(db_backend, db_name)
+    query = """WITH ranked AS(
+        SELECT m.*, ROW_NUMBER() OVER(PARTITION BY id ORDER BY time DESC) as rm
+        FROM `airly_raw_data` as m
+    ), locs as (SELECT id, lat, lng, city, street FROM 'airly_locs')
+    SELECT r.*, l.lat, l.lng FROM ranked r LEFT JOIN locs as l on l.id = r.id where rm = 1
+    """
+    return dbms.pd_readSQL(sql=query)
 
 
 def plot_map(data):
-    """[summary]
+    """Plotting new map
     
     Arguments:
-        data {[df]} -- [dataframe containing at leat 3 columns: Latitude, Longitude, value]
+        data {df} -- [dataframe containing at leat 3 columns: Latitude, Longitude, value]
     
     Returns:
-        [type] -- [description]
-    """    
-    quakes = pd.read_csv(
-        'https://raw.githubusercontent.com/plotly/datasets/master/earthquakes-23k.csv')
-
-    fig = go.Figure(go.Densitymapbox(lat=quakes.Latitude, lon=quakes.Longitude, z=quakes.Magnitude,
-                                    radius=10))
-    fig.update_layout(mapbox_style="stamen-terrain", mapbox_center_lon=180)
+        json -- JSON file with info about plotly figure
+    """
+    fig = go.Figure(go.Densitymapbox(lat=data.lat, lon=data.lng,
+                                     z=data.pm10,
+                                     radius=12))
+    fig.update_layout(mapbox_style="open-street-map",
+                      mapbox_center_lon=19.947015, mapbox_center_lat=50.055163, mapbox_zoom=8)
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
     fig.layout.template = None
 
@@ -36,10 +44,10 @@ def plot_map(data):
     return graphJSON
 
 
-
 @app.route("/")
 def home():
-    graphJSON = plot_map()
+    data = get_data()
+    graphJSON = plot_map(data)
     return render_template('index.html', v=graphJSON)
 
 

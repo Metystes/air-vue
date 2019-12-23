@@ -1,7 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, String, MetaData,
- INTEGER, DateTime, Float, ForeignKey
+from sqlalchemy import (Table, Column, String, MetaData,
+                        INTEGER, DateTime, Float, ForeignKey)
 import configparser
 from os import path
 
@@ -123,7 +123,7 @@ if __name__ == '__main__':
 
 # %% Tests
 Tests = False
-if Tests = True:
+if Tests == True:
     dbms = Database(db_backend, db_name)
     dbms.show_tables()
     dbms.pd_readSQL(sql='SELECT * FROM airly_locs')
