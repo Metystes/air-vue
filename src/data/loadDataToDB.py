@@ -4,9 +4,9 @@ from os import path, remove
 # from sqlalchemy.types import INTEGER, DateTime, Float
 
 # Interior imports
-from .createDB import MyDatabase, db_backend, db_name, AIRLY_DATA, AIRLY_LOCATIONS
+from .createDB import Database, db_backend, db_name, AIRLY_DATA, AIRLY_LOCATIONS
 
-dbms = MyDatabase(db_backend, db_name)
+dbms = Database(db_backend, db_name)
 
 
 class airly():

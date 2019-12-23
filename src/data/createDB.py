@@ -1,9 +1,11 @@
+import pandas as pd
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, String, MetaData, INTEGER, DateTime, Float, ForeignKey
+from sqlalchemy import Table, Column, String, MetaData,
+ INTEGER, DateTime, Float, ForeignKey
 import configparser
 from os import path
 
-# Importing config
+# %% Importing config
 config = configparser.ConfigParser()
 conf_path = path.join('config', 'conf.ini')
 try:
@@ -23,8 +25,8 @@ db_name = config['DATABASE']['db_name']
 AIRLY_DATA = 'airly_raw_data'
 AIRLY_LOCATIONS = 'airly_locs'
 
-
-class MyDatabase:
+# %%
+class Database:
     # If another backend will be needed we can add it below:
     DB_ENGINE = {
         'sqlite': 'sqlite:///{DB}'
@@ -70,7 +72,7 @@ class MyDatabase:
                            Column('id', INTEGER,
                                   ForeignKey(AIRLY_LOCATIONS+'.id')),
                         Column('time', DateTime, nullable=True),
-                        Column('pm10', Float, nullable=True), 
+                        Column('pm10', Float, nullable=True),
                         Column('pm25', Float, nullable=True),
                         Column('temperature', Float, nullable=True),
                         Column('humidity', Float, nullable=True),
@@ -93,11 +95,38 @@ class MyDatabase:
             except Exception as e:
                 print(e)
 
+    def show_tables(self):
+        self._metadata = MetaData(bind=self.db_engine, reflect=True)
+        return self._metadata.sorted_tables
+
+    def pd_readSQL(self, **kwargs):
+        """Reading data by using pandas framework. All parameters are as in pd.read_sql() exepct for con, which is unused.
+        
+        Returns
+        -------
+        df
+            Returning dataframe
+        """
+        kwargs['con'] = self.db_engine
+        data = pd.read_sql(**kwargs)
+        return data
+
 
 def main():
-    dbms = MyDatabase(db_backend, db_name)
+    dbms = Database(db_backend, db_name)
     dbms.create_db_tables()
 
 
 if __name__ == '__main__':
     main()
+
+
+# %% Tests
+Tests = False
+if Tests = True:
+    dbms = Database(db_backend, db_name)
+    dbms.show_tables()
+    dbms.pd_readSQL(sql='SELECT * FROM airly_locs')
+
+
+# %%
