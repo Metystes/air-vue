@@ -17,7 +17,13 @@
         </script>
     </div>
     <p>Open Street Maps</p>
-
+    <p>What the fuck?</p>
+    <div class="chart" id="bargraph1">
+        <script>
+            var graphs = {{ map_inter | safe}};
+            Plotly.plot('bargraph1', graphs, {});
+        </script>
+    </div>
 </body>
 
 </html>

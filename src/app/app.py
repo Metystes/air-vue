@@ -6,6 +6,7 @@ import json
 
 # Import local modules
 from src.data.createDB import (Database, db_backend, db_name)
+from src.models.Interpolation import Interpolation
 
 app = Flask(__name__)
 
@@ -27,18 +28,18 @@ def plot_map(data):
     
     Arguments:
         data {df} -- [dataframe containing at leat 3 columns:
-                      Latitude, Longitude, value]
+                      lat, lng, val]
     
     Returns:
         json -- JSON file with info about plotly figure
     """
     fig = go.Figure(go.Densitymapbox(lat=data.lat, lon=data.lng,
-                                     z=data.pm10,
-                                     radius=12))
-    fig.update_layout(mapbox_style="open-street-map",
+                                     z=data.val,
+                                     radius=15, opacity=0.7))
+    fig.update_layout(mapbox_style="stamen-terrain",
                       mapbox_center_lon=19.947015,
                       mapbox_center_lat=50.055163,
-                      mapbox_zoom=8)
+                      mapbox_zoom=9)
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
     fig.layout.template = None
 
@@ -49,8 +50,17 @@ def plot_map(data):
 @app.route("/")
 def home():
     data = get_data()
+    data.rename(columns={'pm10': 'val'}, inplace=True)
     graphJSON = plot_map(data)
-    return render_template('index.html', v=graphJSON)
+
+    inter = Interpolation()
+    data = inter.predict_grid(
+        49.8, 50.24, 19.6, 20.25, 0.001)
+    data.rename(columns={'x': 'lat', 'y': 'lng'}, inplace=True)
+    graphJSON_Interpolation = plot_map(data)
+
+    return render_template('index.html', v=graphJSON,
+                           map_inter=graphJSON_Interpolation)
 
 
 if __name__ == "__main__":
